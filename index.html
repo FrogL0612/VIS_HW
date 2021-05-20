@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2020 1~11月 各月份地方法院竊盜案數量</title>
+    <script src="https://d3js.org/d3.v6.js"></script>
+</head>
+<body>
+    <g>
+        <div class='chart'>
+            <div class='title'
+             style="text-align:center;width:700px">
+                <p class="'chart_Title">
+                    2020 1~11月 各月份地方法院竊盜案數量<br>
+                </p>
+            </div>
+            <div class="content"
+                 style="text-align:center;width:700px">根據司法院-法學資料檢索統統計2020各月份竊盜案件數。<br>（資料來源：https://law.judicial.gov.tw/FJUD/default.aspx）</div>
+        </div>
+    </g>
+
+    <script>
+         const data = [
+            {   total: 1222,
+                convenience: 124,
+                fight: 49,
+                label: '1月'
+            },
+            {   total: 1579,
+                convenience: 168,
+                fight: 51,
+                label: '2月'
+            },
+            {   total: 1763,
+                convenience: 186,
+                fight: 61,
+                label: '3月'
+            },
+            {   total: 1694,
+                convenience: 177,
+                fight: 53,
+                label: '4月'
+            },
+            {   total: 1741,
+                convenience: 203,
+                fight: 51,
+                label: '5月'
+            },
+            {   total: 1686,
+                convenience: 184,
+                fight: 61,
+                label: '6月'
+            },
+            {   total: 1846,
+                convenience: 188,
+                fight: 63,
+                label: '7月'
+            },
+            {   total: 1705,
+                convenience: 172,
+                fight: 58,
+                label: '8月'
+            },
+            {   total: 1681,
+                convenience: 171,
+                fight: 63,
+                label: '9月'
+            },
+            {   total: 1362,
+                convenience: 164,
+                fight: 56,
+                label: '10月'
+            },
+            {   total: 1604,
+                convenience: 178,
+                fight: 56,
+                label: '11月'
+            }
+         ];
+
+        const margin = 50
+        const width = 700
+        const height = 500
+        const max = d3.max(data, (d) => d.total);
+
+         let svg = d3
+             .select(".chart")
+             .append("svg")
+             .attr("width", width) // 設定 svg 寬
+             .attr("height", height) // 設定 svg 高
+             .style("border", "1px solid #159");
+
+        //繪製x&y軸
+         const xScale = d3
+             .scaleBand()
+             .domain(data.map( d=> d.label ))
+             .range([margin, width - margin])
+             .paddingInner(0.3)
+             .paddingOuter(0.5)
+             .round(true)
+
+         const yScale = d3
+             .scaleLinear()
+             .domain([0, max])
+             .range([height - margin, margin])
+             .nice();
+
+         const xAxis = d3
+             .axisBottom(xScale)
+         const yAxis = d3
+             .axisLeft(yScale)
+
+         svg
+             .append("g")
+             .attr("transform", `translate( 0, ${height - margin})`)
+             .attr("class", "xaxis")
+             .call(xAxis);
+         svg
+             .append("g")
+             .attr("transform", `translate( ${margin}, 0)`)
+             .attr("class", "yaxis")
+             .call(yAxis);
+
+        //繪製長條圖
+         svg
+             .selectAll(".bar")
+             .data(data)
+             .enter()
+             .append("rect")
+             .attr("class", "bar")
+             .attr("fill", "orange")
+             .attr("x", d => xScale(d.label))
+             .attr("y", height - margin)
+             .attr("width", xScale.bandwidth())
+             .attr("height", 0)
+             .transition()
+             .duration(1500)
+             .attr("y", d => yScale(d.total))
+             .attr("height", d => yScale(0) - yScale(d.total))
+
+        //繪製文字
+         svg
+            .selectAll(".text")
+            .data(data)
+            .enter()
+            .append("text")
+            .text(0)
+            .attr("x", d => xScale(d.label))
+            .attr("y", height - margin)
+            .attr("fill", "#000")
+            .transition()
+            .duration(1500)
+            .attr('y', d => yScale(d.total) - 10)
+            .tween('number', function(d) {
+                var i = d3.interpolateRound(0, d.total)
+                return function(t) {
+                    this.textContent = i(t)
+                }
+            })
+
+         svg.append("text")      // text label for the x axis
+             .attr("x", width/2 )
+             .attr("y", height-10 )
+             .attr("font-weight","300")
+             .attr("font-size","16px")
+             .style("text-anchor", "middle")
+             .text("月份");
+
+         svg.append("text")
+             .attr("transform", "rotate(-90)")
+             .attr("y", -3)
+             .attr("x",-height/2+10)
+             .attr("dy", "1em")
+             .attr("font-weight","300")
+             .attr("font-size","16")
+             .attr("letter-spacing","0.5px")
+             .style("text-anchor", "middle")
+             .text("案件數");
+
+    </script>
+</body>
+</html>
